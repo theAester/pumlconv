@@ -9,6 +9,63 @@ A small C code to convert pseudo code ( in C like syntax ) to PlantUML activity 
 make
 sudo make install
 ```
+# Requirements
+In order for the translator to work correctly your source code must have some certain properties:
+
+ <b>1-</b> every blocks opening and closing braces must be placed on a separate line
+  for example
+  ``` c
+  if( check_condition() ){
+    do_sth();
+  }
+  ```
+  will throw an error. You must write it like this instead
+  ```c
+  if( check_condition() )
+  {
+    do_sth();
+  }
+  ```
+<b>2-</b? Your code must be the body of a <b>single procedure</b>. Function definitions are not supported, however you can convert your procedures to plantUML code separatly and mix them into a bigger diagram. See plantUML language documentation for more details see [this](https://plantuml.com/activity-diagram-beta#ezoic-pub-ad-placeholder-647) and [this](https://forum.plantuml.net/2398/is-it-possible-to-add-a-comment-on-top-of-a-activity-partition?show=2403#a2403).
+
+<b>3-</b> only if, else if, else, while, do ... while and for blocks are supported, anything else is parsed as a simple instruction and may cause an error. You can use the special parser directive comments in your code to format or group the source code to make meaningfull diagrams
+
+# Parser Directive comments
+Parser Directives begin with the `//@&` prefix. Some of them are:
+
+<b>1-</b> join directive `//@&\`: place this at the end of a line to tell the parser to join this line and the line after it. Basically it tells the parser to place two lines into one diagram element
+
+<b>2-</b> Group directive `//@&{ ... //@&}`: place these in the <b>separate lines</b>, surrounding a piece of code that you want to be placed in one diagram component or parts of the code that would otherwise not be understandable for the parser(eg: try catch blocks). Same result can be achieved by placeing the join directive at the end of every line within that block.
+
+<b>3-</b> skip directive `//@&s{ ... //@&s}`: tells the parser to skip over the block surrounded by these directivesm as if they were not there.
+
+## example
+``` c
+//@&s{
+int main(int argc, char* argv[]){ // function definitions are not understood by the parser.
+//@&s}
+  int a=10;
+  char c=';';
+  if( argc > 3)
+  {
+    print_usage(); //@&\
+    exit(1);
+  }
+  // we can group the multiline computational part since its basically doing <i>one</i> thing
+  //@&{
+  double r = sqrt(a);
+  double p = r*3.14;
+  r = a/((int) c);
+  r = sqrt(r);
+  r = r-p;
+  p = sqrt(r)*p;
+  //@&}
+  printf("%f", p);
+  return 0;
+//@&s{
+}
+//@&s}
+```
 
 # usage
 Simply run
