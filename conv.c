@@ -192,6 +192,10 @@ int has_join(char* str){
 
 int main(int argc, char* argv[]){
 	char* appname = argv[0];
+	if(argc == 1){
+		print_usage(appname);
+		exit(1);
+	}
 	char* filename = "none";
 	char* outfilename="none";
 	int c;
